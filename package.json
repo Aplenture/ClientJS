@@ -1,0 +1,24 @@
+{
+    "name": "clientjs",
+    "version": "0.1.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "rm -rf dist; mkdir dist; tsc -p tsconfig.json; npm test",
+        "test": "mocha -r ts-node/register 'tests/**/*.ts' --timeout 6000",
+        "postinstall": "npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Aplenture/ClientJS.git"
+    },
+    "author": "Aplenture",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Aplenture/ClientJS/issues"
+    },
+    "homepage": "https://github.com/Aplenture/ClientJS#readme",
+    "dependencies": {
+        "foundationjs": "github:Aplenture/FoundationJS"
+    }
+}
