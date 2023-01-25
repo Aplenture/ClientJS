@@ -1,4 +1,4 @@
-import { Node, View } from "../utils";
+import { View } from "../utils";
 
 export class Container extends View {
     public readonly contentView = new View('content');
@@ -9,9 +9,7 @@ export class Container extends View {
         super.appendChild(this.contentView);
     }
 
-    public get children(): readonly Node<'div'>[] { return this.contentView.children; }
-    public get firstChild(): Node<'div'> { return this.contentView.firstChild; }
-    public get lastChild(): Node<'div'> { return this.contentView.lastChild; }
+    public get children(): readonly View[] { return this.contentView.children; }
 
     public focus() {
         this.contentView.focus();

@@ -1,3 +1,4 @@
+import { Client } from "./client";
 import { View } from "./view";
 
 export class ViewController {
@@ -11,11 +12,9 @@ export class ViewController {
         this.view = new View(...classes);
     }
 
+    public get index(): number { return Client.router.route && Client.router.route.index; }
     public get parent(): ViewController { return this._parent; }
-
     public get children(): readonly ViewController[] { return this._children; }
-    public get firstChild(): ViewController { return this._children.length ? this._children[0] : null; }
-    public get lastChild(): ViewController { return this._children.length ? this._children[this._children.length - 1] : null; }
 
     public init() {
         this._children.forEach(child => child.init());

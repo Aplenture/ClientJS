@@ -1,12 +1,14 @@
 import * as Foundation from "foundationjs";
 
-interface Options {
+export interface RequestOptions {
     readonly type?: Foundation.RequestMethod;
     readonly useCredentials?: boolean;
     readonly headers?: NodeJS.ReadOnlyDict<string>;
 }
 
-export abstract class Request<TResponse, TParams> {
+export class Request<TResponse, TParams> {
+    public readonly onSending = new Foundation.Event<Request<TResponse, TParams>, string>();
+
     public readonly type: Foundation.RequestMethod;
 
     private readonly _request = new XMLHttpRequest();
@@ -15,7 +17,8 @@ export abstract class Request<TResponse, TParams> {
 
     constructor(
         public readonly path: string,
-        options: Options = {}
+        public readonly parser: (data: string) => TResponse,
+        options: RequestOptions = {}
     ) {
         this.type = options.type || Foundation.RequestMethod.Get;
 
@@ -27,7 +30,7 @@ export abstract class Request<TResponse, TParams> {
 
     public get isRunning(): boolean { return this._running; }
 
-    public send(params: TParams, headers: NodeJS.ReadOnlyDict<string> = {}): Promise<TResponse | null> {
+    public send(params: TParams, headers: NodeJS.ReadOnlyDict<string> = {}): Promise<TResponse> {
         if (this._running)
             throw new Error('request is running already');
 
@@ -45,7 +48,7 @@ export abstract class Request<TResponse, TParams> {
                         let result: TResponse;
 
                         try {
-                            result = this.parse(this._request.responseText);
+                            result = this.parser(this._request.responseText);
                         } catch (error) {
                             return reject(error);
                         }
@@ -61,7 +64,7 @@ export abstract class Request<TResponse, TParams> {
                 }
             };
 
-            const paramString = this.createParamString(params);
+            const paramString = this.paramsToString(params);
             const path = this.createPath(paramString);
             const body = this.createBody(paramString);
 
@@ -69,6 +72,9 @@ export abstract class Request<TResponse, TParams> {
 
             this._request.open(this.type, path, true);
             this._request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            this.onSending.emit(this, paramString);
+
             this._request.send(body);
         });
     }
@@ -77,24 +83,25 @@ export abstract class Request<TResponse, TParams> {
         this._request.setRequestHeader(name, value);
     }
 
-    protected abstract parse(result: any): TResponse;
+    protected paramsToString(params: NodeJS.ReadOnlyDict<any> = {}): string {
+        if (!params)
+            return "";
 
-    private createParamString(params: NodeJS.ReadOnlyDict<any> = {}): string {
         const args = [];
 
         for (const key in params) {
             if (typeof params[key] == "boolean")
                 args.push(`${key}=${params[key] ? 1 : 0}`);
             else if (Array.isArray(params[key]))
-                params[key].forEach(value => args.push(`${key}=${Foundation.encodeString(value)}`));
+                (params[key] as any).forEach(value => args.push(`${key}=${Foundation.encodeString(value)}`));
             else
-                args.push(`${key}=${Foundation.encodeString(params[key])}`)
+                args.push(`${key}=${Foundation.encodeString(params[key] as any)}`)
         }
 
         return args.join("&");
     }
 
-    private createPath(params: string): string {
+    protected createPath(params: string): string {
         let result = '';
 
         switch (this.type) {
@@ -112,7 +119,7 @@ export abstract class Request<TResponse, TParams> {
         return result;
     }
 
-    private createBody(params: string): any {
+    protected createBody(params: string): any {
         switch (this.type) {
             case Foundation.RequestMethod.Post:
                 return params;
