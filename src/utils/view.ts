@@ -6,7 +6,7 @@ export class View {
     public propaginateClickEvents = false;
 
     protected readonly div = document.createElement('div');
-    
+
     private readonly _children: View[] = [];
 
     private _parent: View;
@@ -32,7 +32,12 @@ export class View {
     public set description(value: string) { this.div.title = value; }
 
     public get hidden(): boolean { return this.div.hidden; }
-    public set hidden(value: boolean) { this.div.hidden = value; }
+    public set hidden(value: boolean) {
+        this.div.hidden = value;
+
+        if (!value)
+            this.focus();
+    }
 
     public get visible(): boolean { return !this.hidden; }
     public set visible(value: boolean) { this.hidden = !value; }

@@ -103,9 +103,9 @@ export abstract class Client {
 
     private static async loadTranslation(defaultLanguage: string): Promise<NodeJS.ReadOnlyDict<string>> {
         try {
-            return await new Request<NodeJS.ReadOnlyDict<string>, void>(`/${navigator.language}.json`, JSON.parse).send();
+            return await new Request<void, NodeJS.ReadOnlyDict<string>>(`/${navigator.language}.json`, JSON.parse).send();
         } catch (e) {
-            return await new Request<NodeJS.ReadOnlyDict<string>, void>(`/${defaultLanguage}.json`, JSON.parse).send();
+            return await new Request<void, NodeJS.ReadOnlyDict<string>>(`/${defaultLanguage}.json`, JSON.parse).send();
         }
     }
 }

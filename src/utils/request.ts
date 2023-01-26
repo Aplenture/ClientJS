@@ -6,8 +6,8 @@ export interface RequestOptions {
     readonly headers?: NodeJS.ReadOnlyDict<string>;
 }
 
-export class Request<TResponse, TParams> {
-    public readonly onSending = new Foundation.Event<Request<TResponse, TParams>, string>();
+export class Request<TParams, TResponse> {
+    public readonly onSending = new Foundation.Event<Request<TParams, TResponse>, string>();
 
     public readonly type: Foundation.RequestMethod;
 

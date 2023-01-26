@@ -25,11 +25,13 @@ export class MessageViewController extends ViewController {
         super.init();
     }
 
-    public push(message: Foundation.Message) {
+    public push(message: Foundation.Message): Promise<void> {
         this._stack.push(message);
 
         if (1 == this._stack.count)
             this.next();
+
+        return new Promise<void>(resolve => this.onDone.once(resolve));
     }
 
     public next() {
