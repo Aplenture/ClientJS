@@ -11,7 +11,7 @@ export * from "./label";
 export * from "./leftFlexView";
 export * from "./rightFlexView";
 export * from "./switch";
-export * from "./textfield";
+export * from "./textField";
 export * from "./titleBar";
 export * from "./titledLabel";
 export * from "./topFlexView";

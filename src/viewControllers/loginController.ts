@@ -1,12 +1,12 @@
-import { Textfield, Switch, Button, TitleBar } from "../views";
+import { TextField, Switch, Button, TitleBar } from "../views";
 import { Client, ViewController } from "../utils";
 
 export class LoginController extends ViewController {
     public readonly titleBar = new TitleBar();
     public readonly loginButton = new Button('login');
 
-    public readonly usernameTextfield = new Textfield('username');
-    public readonly passwordTextfield = new Textfield('password');
+    public readonly usernameTextfield = new TextField('username');
+    public readonly passwordTextfield = new TextField('password');
 
     public readonly keepLoginSwitch = new Switch('keepLogin');
 

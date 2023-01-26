@@ -1,15 +1,15 @@
 import * as Foundation from "foundationjs";
 import { View } from "../utils";
 
-export class Textfield extends View {
-    public readonly onReturn = new Foundation.Event<Textfield, void>();
-    public readonly onChange = new Foundation.Event<Textfield, string>();
+export class TextField extends View {
+    public readonly onReturn = new Foundation.Event<TextField, void>();
+    public readonly onChange = new Foundation.Event<TextField, string>();
 
     protected readonly label = document.createElement('label');
     protected readonly input = document.createElement('input');
 
     constructor(...classes: readonly string[]) {
-        super(...classes, 'textfield');
+        super(...classes, 'textField');
 
         this.div.appendChild(this.label);
         this.div.appendChild(this.input);
