@@ -78,6 +78,10 @@ export class View {
         this.onClick.emit(this);
     }
 
+    public hasClass(value: string): boolean {
+        return this.div.classList.contains(value);
+    }
+
     public addClass(value: string) {
         this.div.classList.add(value);
     }
