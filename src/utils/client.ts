@@ -70,7 +70,7 @@ export abstract class Client {
         this.rootViewController.appendChild(messagePopupViewController);
         this.rootViewController.init();
 
-        document.body.appendChild((this.rootViewController.view as any)._node);
+        document.body.appendChild((this.rootViewController.view as any).div);
         (window as any).client = this;
 
         if (document.readyState === "complete")

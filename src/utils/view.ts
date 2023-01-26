@@ -5,17 +5,18 @@ export class View {
 
     public propaginateClickEvents = false;
 
-    private readonly _node = document.createElement('div');
+    protected readonly div = document.createElement('div');
+    
     private readonly _children: View[] = [];
 
     private _parent: View;
 
     constructor(...classes: readonly string[]) {
-        classes.forEach(c => this._node.classList.add(c));
+        classes.forEach(c => this.div.classList.add(c));
 
-        this._node.id = classes.join('_');
-        this._node.addEventListener('mousedown', event => event.detail > 1 && event.preventDefault(), false);
-        this._node.addEventListener('click', event => {
+        this.div.id = classes.join('_');
+        this.div.addEventListener('mousedown', event => event.detail > 1 && event.preventDefault(), false);
+        this.div.addEventListener('click', event => {
             this.onClick.emit(this);
 
             if (!this.propaginateClickEvents)
@@ -23,12 +24,15 @@ export class View {
         });
     }
 
-    public get id(): string { return this._node.id; }
+    public get id(): string { return this.div.id; }
     public get parent(): View { return this._parent; }
     public get children(): readonly View[] { return this._children; }
 
-    public get hidden(): boolean { return this._node.hidden; }
-    public set hidden(value: boolean) { this._node.hidden = value; }
+    public get description(): string { return this.div.title; }
+    public set description(value: string) { this.div.title = value; }
+
+    public get hidden(): boolean { return this.div.hidden; }
+    public set hidden(value: boolean) { this.div.hidden = value; }
 
     public get visible(): boolean { return !this.hidden; }
     public set visible(value: boolean) { this.hidden = !value; }
@@ -36,32 +40,32 @@ export class View {
     public get enabled(): boolean { return !this.disabled; }
     public set enabled(value: boolean) { this.disabled = !value; }
 
-    public get disabled(): boolean { return this._node.classList.contains('disabled'); }
+    public get disabled(): boolean { return this.div.classList.contains('disabled'); }
     public set disabled(value: boolean) {
         if (value)
-            this._node.classList.add('disabled');
+            this.div.classList.add('disabled');
         else
-            this._node.classList.remove('disabled');
+            this.div.classList.remove('disabled');
     }
 
-    public get selected(): boolean { return this._node.classList.contains('selected'); }
+    public get selected(): boolean { return this.div.classList.contains('selected'); }
     public set selected(value: boolean) {
         if (value)
-            this._node.classList.add('selected');
+            this.div.classList.add('selected');
         else
-            this._node.classList.remove('selected');
+            this.div.classList.remove('selected');
     }
 
-    public get clickable(): boolean { return this._node.classList.contains('clickable'); }
+    public get clickable(): boolean { return this.div.classList.contains('clickable'); }
     public set clickable(value: boolean) {
         if (value)
-            this._node.classList.add('clickable');
+            this.div.classList.add('clickable');
         else
-            this._node.classList.remove('clickable');
+            this.div.classList.remove('clickable');
     }
 
     public focus() {
-        this._node.focus();
+        this.div.focus();
         this.children.forEach(child => child.focus());
     }
 
@@ -70,11 +74,11 @@ export class View {
     }
 
     public addClass(value: string) {
-        this._node.classList.add(value);
+        this.div.classList.add(value);
     }
 
     public removeClass(value: string) {
-        this._node.classList.remove(value);
+        this.div.classList.remove(value);
     }
 
     public appendChild(child: View) {
@@ -83,16 +87,16 @@ export class View {
 
         child._parent = this;
 
-        this._node.appendChild(child._node);
+        this.div.appendChild(child.div);
         this._children.push(child);
     }
 
     public removeChild(child: View) {
-        this._node.childNodes.forEach((node, index) => {
-            if (node !== child._node)
+        this.div.childNodes.forEach((node, index) => {
+            if (node !== child.div)
                 return;
 
-            this._node.removeChild(child._node);
+            this.div.removeChild(child.div);
             this._children.splice(index, 1);
 
             child._parent = null;
@@ -100,7 +104,7 @@ export class View {
     }
 
     public removeAllChildren() {
-        this._node.childNodes.forEach(node => this._node.removeChild(node));
+        this.div.childNodes.forEach(node => this.div.removeChild(node));
 
         this._children.forEach(child => child._parent = null);
         this._children.splice(0, this._children.length);

@@ -1,17 +1,14 @@
 import { View } from "../utils";
 
 export class Label extends View {
-    protected readonly _label = document.createElement('span');
+    protected readonly label = document.createElement('label');
 
     constructor(...classes: readonly string[]) {
         super(...classes, 'label');
 
-        this._label.classList.add('label');
-        this._label.id = classes.join('_');
-
-        (this as any)._node.appendChild(this._label);
+        this.div.appendChild(this.label);
     }
 
-    public get text(): string { return this._label.innerText; }
-    public set text(value: string) { this._label.innerText = value; }
+    public get text(): string { return this.label.innerText; }
+    public set text(value: string) { this.label.innerText = value; }
 }
