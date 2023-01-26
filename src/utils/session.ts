@@ -1,15 +1,30 @@
 import * as Foundation from "foundationjs";
+import { Request } from "./request";
 
 const KEY_ACCESS = 'session.access';
+
+export interface SessionConfig {
+    readonly hasAccessURL: string;
+}
 
 export class Session {
     public readonly onAccessChanged = new Foundation.Event<Session, Foundation.Access>();
 
-    private _access: Foundation.Access;
+    private readonly _hasAccessRequest: Request<boolean, {
+        readonly session: string,
+        readonly signature: string,
+        readonly timestamp: number
+    }>;
+
+    private _access: Foundation.Access = null;
+
+    constructor(config: SessionConfig) {
+        this._hasAccessRequest = new Request(config.hasAccessURL, Foundation.parseToBool);
+    }
 
     public get access(): Foundation.Access { return this._access; }
 
-    public init() {
+    public async init() {
         const serializedAccess = window.sessionStorage.getItem(KEY_ACCESS)
             || window.localStorage.getItem(KEY_ACCESS);
 
@@ -18,8 +33,11 @@ export class Session {
 
         const access = Foundation.Access.fromHex(serializedAccess);
 
-        if (!access)
+        if (!(await this.hasAccess(access))) {
+            window.localStorage.removeItem(KEY_ACCESS);
+            window.sessionStorage.removeItem(KEY_ACCESS);
             return;
+        }
 
         this._access = access;
 
@@ -32,11 +50,11 @@ export class Session {
         this._access = access;
 
         if (keepLogin) {
-            localStorage.setItem(KEY_ACCESS, serialization);
-            sessionStorage.removeItem(KEY_ACCESS);
+            window.localStorage.setItem(KEY_ACCESS, serialization);
+            window.sessionStorage.removeItem(KEY_ACCESS);
         } else {
-            sessionStorage.setItem(KEY_ACCESS, serialization);
-            localStorage.removeItem(KEY_ACCESS);
+            window.sessionStorage.setItem(KEY_ACCESS, serialization);
+            window.localStorage.removeItem(KEY_ACCESS);
         }
 
         this.onAccessChanged.emit(this, access);
@@ -45,9 +63,19 @@ export class Session {
     public resetAccess() {
         this._access = null;
 
-        localStorage.removeItem(KEY_ACCESS);
-        sessionStorage.removeItem(KEY_ACCESS);
+        window.localStorage.removeItem(KEY_ACCESS);
+        window.sessionStorage.removeItem(KEY_ACCESS);
 
         this.onAccessChanged.emit(this, null);
+    }
+
+    private hasAccess(access = this._access): Promise<boolean> {
+        const timestamp = Date.now();
+
+        return this._hasAccessRequest.send({
+            session: access.id,
+            signature: access.sign(timestamp.toString()),
+            timestamp
+        });
     }
 }
