@@ -86,7 +86,7 @@ export class Session {
         this.onAccessChanged.emit(this, null);
     }
 
-    public async login(username: string, password: string, keepLogin?: boolean, label = ''): Promise<Foundation.Access> {
+    public async login(username: string, password: string, keepLogin?: boolean, label?: string): Promise<Foundation.Access> {
         const timestamp = Date.now();
         const hash = Foundation.toHashInt(timestamp.toString());
         const privateKey = Foundation.EC.createPrivateKey(password);
@@ -130,13 +130,19 @@ export class Session {
         }
     }
 
-    private hasAccess(access = this._access): Promise<boolean> {
+    private async hasAccess(access = this._access): Promise<boolean> {
         const timestamp = Date.now();
 
-        return this.hasAccessRequest.send({
-            session: access.id,
-            signature: access.sign(timestamp.toString()),
-            timestamp
-        });
+        try {
+            return await this.hasAccessRequest.send({
+                session: access.id,
+                signature: access.sign(timestamp.toString()),
+                timestamp
+            });
+        } catch (error) {
+            await Client.messageViewController.push({ text: error.message, title: Client.translator.translate('error') });
+
+            return false;
+        }
     }
 }
