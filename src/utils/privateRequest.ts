@@ -1,5 +1,5 @@
 import * as Foundation from "foundationjs";
-import { Client, Request, RequestOptions } from "../utils";
+import { Client, Request, RequestOptions } from ".";
 
 export class PrivateRequest<TParams, TResponse> extends Request<TParams, TResponse> {
     constructor(path: string, parser: (data: string) => TResponse, options?: RequestOptions) {
