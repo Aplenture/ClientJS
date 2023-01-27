@@ -1,4 +1,3 @@
-import { Client } from "./client";
 import { View } from "./view";
 
 export class ViewController {
@@ -12,7 +11,6 @@ export class ViewController {
         this.view = new View(...classes);
     }
 
-    public get index(): number { return Client.router.route && Client.router.route.index; }
     public get parent(): ViewController { return this._parent; }
     public get children(): readonly ViewController[] { return this._children; }
 

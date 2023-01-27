@@ -1,6 +1,6 @@
 import * as Foundation from "foundationjs";
-import { Client } from "./client";
-import { Request } from "./request";
+import { BoolRequest, JSONRequest } from "../requests";
+import { MessageViewController } from "../viewControllers";
 
 const KEY_ACCESS = 'session.access';
 
@@ -11,16 +11,16 @@ export interface SessionConfig {
 }
 
 export class Session {
-    public readonly onAccessChanged = new Foundation.Event<Session, Foundation.Access>();
+    public static readonly onAccessChanged = new Foundation.Event<Session, Foundation.Access>();
 
-    private readonly logoutRequest: Request<{ session: string }, boolean>;
-    private readonly hasAccessRequest: Request<{
+    private readonly logoutRequest: BoolRequest<{ session: string }>;
+    private readonly hasAccessRequest: BoolRequest<{
         readonly session: string,
         readonly signature: string,
         readonly timestamp: number
-    }, boolean>;
+    }>;
 
-    private readonly loginRequest: Request<{
+    private readonly loginRequest: JSONRequest<{
         readonly timestamp: number,
         readonly username: string,
         readonly sign: string,
@@ -33,10 +33,10 @@ export class Session {
 
     private _access: Foundation.Access = null;
 
-    constructor(config: SessionConfig) {
-        this.hasAccessRequest = new Request(config.hasAccessURL, Foundation.parseToBool);
-        this.loginRequest = new Request(config.loginURL, JSON.parse);
-        this.logoutRequest = new Request(config.logoutURL, Foundation.parseToBool);
+    constructor(public readonly messageViewController: MessageViewController, config: SessionConfig) {
+        this.hasAccessRequest = new BoolRequest(config.hasAccessURL);
+        this.loginRequest = new JSONRequest(config.loginURL);
+        this.logoutRequest = new BoolRequest(config.logoutURL);
     }
 
     public get access(): Foundation.Access { return this._access; }
@@ -58,7 +58,7 @@ export class Session {
 
         this._access = access;
 
-        this.onAccessChanged.emit(this, this._access);
+        Session.onAccessChanged.emit(this, this._access);
     }
 
     public updateAccess(access: Foundation.Access, keepLogin = false) {
@@ -74,7 +74,7 @@ export class Session {
             window.localStorage.removeItem(KEY_ACCESS);
         }
 
-        this.onAccessChanged.emit(this, access);
+        Session.onAccessChanged.emit(this, access);
     }
 
     public resetAccess() {
@@ -83,7 +83,7 @@ export class Session {
         window.localStorage.removeItem(KEY_ACCESS);
         window.sessionStorage.removeItem(KEY_ACCESS);
 
-        this.onAccessChanged.emit(this, null);
+        Session.onAccessChanged.emit(this, null);
     }
 
     public async login(username: string, password: string, keepLogin?: boolean, label?: string): Promise<Foundation.Access> {
@@ -107,7 +107,7 @@ export class Session {
 
             return access;
         } catch (error) {
-            Client.messageViewController.push({ text: error.message, title: Client.translator.translate('error') });
+            this.messageViewController.push({ text: error.message, title: '#_error' });
 
             throw error;
         }
@@ -124,7 +124,7 @@ export class Session {
 
             return true;
         } catch (error) {
-            await Client.messageViewController.push({ text: error.message, title: Client.translator.translate('error') });
+            await this.messageViewController.push({ text: error.message, title: '#_error' });
 
             return false;
         }
@@ -140,7 +140,7 @@ export class Session {
                 timestamp
             });
         } catch (error) {
-            await Client.messageViewController.push({ text: error.message, title: Client.translator.translate('error') });
+            await this.messageViewController.push({ text: error.message, title: '#_error' });
 
             return false;
         }

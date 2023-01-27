@@ -2,7 +2,7 @@ import * as Foundation from "foundationjs";
 import { View } from "../utils";
 
 export class Switch extends View {
-    public readonly onChange = new Foundation.Event<Switch, boolean>();
+    public static readonly onChange = new Foundation.Event<Switch, boolean>();
 
     protected readonly label = document.createElement('label');
     protected readonly input = document.createElement('input');
@@ -15,19 +15,19 @@ export class Switch extends View {
         const span2 = document.createElement('span');
 
         this.input.type = 'checkbox';
-        this.input.addEventListener('change', () => this.onChange.emit(this, this.input.checked));
+        this.input.addEventListener('change', () => Switch.onChange.emit(this, this.input.checked));
 
         label.appendChild(this.input);
         label.appendChild(span1);
-        
+
         span1.appendChild(span2);
-        
+
         this.div.appendChild(this.label);
         this.div.appendChild(label);
     }
 
     public get title(): string { return this.label.innerText; }
-    public set title(value: string) { this.label.innerText = value; }
+    public set title(value: string) { this.label.innerText = Foundation.Localization.translate(value); }
 
     public get enabled(): boolean { return this.input.checked; }
     public set enabled(value: boolean) { this.input.checked = value; }

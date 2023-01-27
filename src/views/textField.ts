@@ -1,9 +1,14 @@
 import * as Foundation from "foundationjs";
 import { View } from "../utils";
 
+export enum TextFieldType {
+    Text = 'text',
+    Password = 'password'
+}
+
 export class TextField extends View {
-    public readonly onReturn = new Foundation.Event<TextField, void>();
-    public readonly onChange = new Foundation.Event<TextField, string>();
+    public static readonly onReturn = new Foundation.Event<TextField, void>();
+    public static readonly onChange = new Foundation.Event<TextField, string>();
 
     protected readonly label = document.createElement('label');
     protected readonly input = document.createElement('input');
@@ -21,14 +26,17 @@ export class TextField extends View {
                 return;
 
             event.preventDefault();
-            this.onReturn.emit(this);
+            TextField.onReturn.emit(this);
         });
 
-        this.input.addEventListener("input", (event: InputEvent) => this.onChange.emit(this, event.data));
+        this.input.addEventListener("input", (event: InputEvent) => TextField.onChange.emit(this, event.data));
     }
 
+    public get type(): TextFieldType { return this.input.type as any; }
+    public set type(value: TextFieldType) { this.input.type = value; }
+
     public get title(): string { return this.label.innerText; }
-    public set title(value: string) { this.label.innerText = value; }
+    public set title(value: string) { this.label.innerText = Foundation.Localization.translate(value); }
 
     public get text(): string { return this.input.value; }
     public set text(value: string) { this.input.value = value; }

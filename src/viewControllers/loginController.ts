@@ -1,5 +1,6 @@
 import { TextField, Switch, Button, TitleBar } from "../views";
-import { Client, ViewController } from "../utils";
+import { Session, ViewController } from "../utils";
+import { MessageViewController } from "./messageViewController";
 
 export class LoginController extends ViewController {
     public readonly titleBar = new TitleBar();
@@ -10,7 +11,11 @@ export class LoginController extends ViewController {
 
     public readonly keepLoginSwitch = new Switch('keepLogin');
 
-    constructor(...classes: string[]) {
+    constructor(
+        public readonly session: Session,
+        public readonly messageViewController: MessageViewController,
+        ...classes: string[]
+    ) {
         super(...classes, 'login');
     }
 
@@ -21,9 +26,9 @@ export class LoginController extends ViewController {
         this.view.appendChild(this.keepLoginSwitch);
         this.view.appendChild(this.loginButton);
 
-        this.usernameTextfield.onReturn.on(() => this.login());
-        this.passwordTextfield.onReturn.on(() => this.login());
-        this.loginButton.onClick.on(() => this.login());
+        TextField.onReturn.on(() => this.login(), this.usernameTextfield);
+        TextField.onReturn.on(() => this.login(), this.passwordTextfield);
+        Button.onClick.on(() => this.login(), this.loginButton);
 
         super.init();
     }
@@ -42,7 +47,7 @@ export class LoginController extends ViewController {
         const username = this.usernameTextfield.text;
 
         if (!username) {
-            await Client.messageViewController.push({ text: 'username_not_set', title: Client.translator.translate('error') });
+            await this.messageViewController.push({ text: '#_username_not_set', title: '#_error' });
             this.usernameTextfield.focus();
             return;
         }
@@ -50,7 +55,7 @@ export class LoginController extends ViewController {
         const password = this.passwordTextfield.text;
 
         if (!password) {
-            await Client.messageViewController.push({ text: 'password_not_set', title: Client.translator.translate('error') });
+            await this.messageViewController.push({ text: '#_password_not_set', title: '#_error' });
             this.passwordTextfield.focus();
             return;
         }
@@ -58,7 +63,7 @@ export class LoginController extends ViewController {
         const keepLogin = this.keepLoginSwitch.enabled;
         const label = navigator.userAgent;
 
-        Client.session
+        this.session
             .login(username, password, keepLogin, label)
             .then(() => this.clear())
             .catch(() => this.focus());

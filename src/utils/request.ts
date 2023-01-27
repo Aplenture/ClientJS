@@ -4,25 +4,26 @@ export interface RequestOptions {
     readonly type?: Foundation.RequestMethod;
     readonly useCredentials?: boolean;
     readonly headers?: NodeJS.ReadOnlyDict<string>;
+    readonly isPrivate?: boolean;
 }
 
-export class Request<TParams, TResponse> {
-    public readonly onSending = new Foundation.Event<Request<TParams, TResponse>, string>();
+export abstract class Request<TParams, TResponse> {
+    public static readonly onSending = new Foundation.Event<Request<any, any>, string>();
 
     public readonly type: Foundation.RequestMethod;
+    public readonly isPrivate: boolean;
 
-    private readonly _request = new XMLHttpRequest();
+    private readonly request = new XMLHttpRequest();
 
     private _running = false;
 
     constructor(
-        public readonly path: string,
-        public readonly parser: (data: string) => TResponse,
+        public url = '',
         options: RequestOptions = {}
     ) {
         this.type = options.type || Foundation.RequestMethod.Get;
-
-        this._request.withCredentials = options.useCredentials;
+        this.isPrivate = options.isPrivate || false;
+        this.request.withCredentials = options.useCredentials;
 
         if (options.headers)
             Object.keys(options.headers).forEach(name => this.setHeader(name, options.headers[name]));
@@ -30,25 +31,25 @@ export class Request<TParams, TResponse> {
 
     public get isRunning(): boolean { return this._running; }
 
-    public send(params: TParams, headers: NodeJS.ReadOnlyDict<string> = {}): Promise<TResponse> {
+    public send(params: TParams, url = this.url): Promise<TResponse> {
         if (this._running)
             throw new Error('request is running already');
 
         this._running = true;
 
         return new Promise<TResponse>((resolve, reject) => {
-            this._request.onreadystatechange = () => {
-                if (this._request.readyState !== 4)
+            this.request.onreadystatechange = () => {
+                if (this.request.readyState !== 4)
                     return;
 
                 this._running = false;
 
-                switch (this._request.status) {
+                switch (this.request.status) {
                     case Foundation.ResponseCode.OK: {
                         let result: TResponse;
 
                         try {
-                            result = this.parser(this._request.responseText);
+                            result = this.parse(this.request.responseText);
                         } catch (error) {
                             return reject(error);
                         }
@@ -60,37 +61,40 @@ export class Request<TParams, TResponse> {
                         return resolve(null);
 
                     default:
-                        return reject(new Error(this._request.responseText));
+                        return reject(new Error(this.request.responseText));
                 }
             };
 
             const paramString = this.paramsToString(params);
-            const path = this.createPath(paramString);
+            const uri = this.createURI(paramString, url);
             const body = this.createBody(paramString);
 
-            Object.keys(headers).forEach(name => this.setHeader(name, headers[name]));
+            this.request.open(this.type, uri, true);
+            this.request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            this._request.open(this.type, path, true);
-            this._request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            Request.onSending.emit(this, paramString);
 
-            this.onSending.emit(this, paramString);
-
-            this._request.send(body);
+            this.request.send(body);
         });
     }
 
     public setHeader(name: string, value: string) {
-        this._request.setRequestHeader(name, value);
+        this.request.setRequestHeader(name, value);
     }
 
-    protected paramsToString(params: NodeJS.ReadOnlyDict<any> = {}): string {
+    protected abstract parse(data: string): TResponse;
+
+    protected paramsToString(params: NodeJS.Dict<any> = {}): string {
+        if (this.isPrivate)
+            params['timestamp'] = Date.now();
+
         if (!params)
-            return "";
+            return '';
 
         const args = [];
 
         for (const key in params) {
-            if (typeof params[key] == "boolean")
+            if (typeof params[key] == 'boolean')
                 args.push(`${key}=${params[key] ? 1 : 0}`);
             else if (Array.isArray(params[key]))
                 (params[key] as any).forEach(value => args.push(`${key}=${Foundation.encodeString(value)}`));
@@ -98,21 +102,21 @@ export class Request<TParams, TResponse> {
                 args.push(`${key}=${Foundation.encodeString(params[key] as any)}`)
         }
 
-        return args.join("&");
+        return args.join('&');
     }
 
-    protected createPath(params: string): string {
+    protected createURI(params: string, url: string): string {
         let result = '';
 
         switch (this.type) {
             case Foundation.RequestMethod.Get:
                 result += params
-                    ? this.path + "?" + params
-                    : this.path;
+                    ? url + "?" + params
+                    : url;
                 break;
 
             default:
-                result += this.path;
+                result += url;
                 break;
         }
 

@@ -1,3 +1,4 @@
+import * as Foundation from "foundationjs";
 import { View } from "../utils";
 
 export class TitledLabel extends View {
@@ -12,8 +13,8 @@ export class TitledLabel extends View {
     }
 
     public get title(): string { return this.titleLabel.innerText; }
-    public set title(value: string) { this.titleLabel.innerText = value; }
+    public set title(value: string) { this.titleLabel.innerText = Foundation.Localization.translate(value); }
 
     public get text(): string { return this.valueLabel.innerText; }
-    public set text(value: string) { this.valueLabel.innerText = value; }
+    public set text(value: string) { this.valueLabel.innerText = Foundation.Localization.translate(value); }
 }

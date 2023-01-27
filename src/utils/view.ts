@@ -1,7 +1,7 @@
 import * as Foundation from "foundationjs";
 
 export class View {
-    public readonly onClick = new Foundation.Event<View, void>();
+    public static readonly onClick = new Foundation.Event<View, void>();
 
     public propaginateClickEvents = false;
 
@@ -17,7 +17,7 @@ export class View {
         this.div.id = classes.join('_');
         this.div.addEventListener('mousedown', event => event.detail > 1 && event.preventDefault(), false);
         this.div.addEventListener('click', event => {
-            this.onClick.emit(this);
+            View.onClick.emit(this);
 
             if (!this.propaginateClickEvents)
                 event.stopPropagation();
@@ -75,7 +75,7 @@ export class View {
     }
 
     public click() {
-        this.onClick.emit(this);
+        View.onClick.emit(this);
     }
 
     public hasClass(value: string): boolean {

@@ -18,8 +18,8 @@ export interface TableViewControllerSource<TCell extends View> {
 }
 
 export class TableViewController<TCell extends View> extends ViewController {
-    public readonly onSelected = new Foundation.Event<TableViewController<TCell>, number>();
-    public readonly onDeselected = new Foundation.Event<TableViewController<TCell>, number>();
+    public static readonly onSelected = new Foundation.Event<TableViewController<any>, number>();
+    public static readonly onDeselected = new Foundation.Event<TableViewController<any>, number>();
 
     private _header: View;
 
@@ -104,7 +104,7 @@ export class TableViewController<TCell extends View> extends ViewController {
 
         this._cells.forEach(child => child.selected = false);
 
-        this._selectedRows.forEach(index => this.onDeselected.emit(this, index));
+        this._selectedRows.forEach(index => TableViewController.onDeselected.emit(this, index));
         this._selectedRows.splice(0, this._selectedRows.length);
     }
 
@@ -116,7 +116,7 @@ export class TableViewController<TCell extends View> extends ViewController {
 
         this._cells[row].selected = false;
         this._selectedRows.splice(index, 1);
-        this.onDeselected.emit(this, row);
+        TableViewController.onDeselected.emit(this, row);
     }
 
     public selectRow(row: number): void {
@@ -136,7 +136,7 @@ export class TableViewController<TCell extends View> extends ViewController {
                 this._selectedRows.push(row);
         }
 
-        this.onSelected.emit(this, row);
+        TableViewController.onSelected.emit(this, row);
     }
 
     public cellIndex(cell: TCell): number {
@@ -147,7 +147,8 @@ export class TableViewController<TCell extends View> extends ViewController {
         const cell = this.source.createCell(category);
 
         cell.clickable = this._selectionMode != TableViewControllerSelectionMode.None;
-        cell.onClick.on(() => {
+
+        View.onClick.on(() => {
             if (this._selectionMode == TableViewControllerSelectionMode.None)
                 return;
 
@@ -157,7 +158,7 @@ export class TableViewController<TCell extends View> extends ViewController {
                 this.deselectRow(row);
             else
                 this.selectRow(row);
-        });
+        }, cell);
 
         return cell;
     }

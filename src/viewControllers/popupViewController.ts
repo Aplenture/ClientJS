@@ -1,4 +1,4 @@
-import { ViewController } from "../utils";
+import { View, ViewController } from "../utils";
 import { Container } from "../views";
 
 export class PopupViewController extends ViewController {
@@ -12,7 +12,8 @@ export class PopupViewController extends ViewController {
 
     public init(): void {
         this.view.appendChild(this.contentView);
-        this.view.onClick.on(() => this.autoHide && this.removeFromParent());
+
+        View.onClick.on(() => this.autoHide && this.removeFromParent(), this.view);
 
         super.init();
     }
