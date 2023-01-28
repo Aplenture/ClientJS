@@ -23,7 +23,7 @@ export class MessageViewController extends ViewController {
 
         this.doneButton.text = '#_done';
 
-        Button.onClick.on(() => this.next(), this.doneButton);
+        Button.onClick.on(() => this.next(), { sender: this.doneButton });
 
         super.init();
     }
@@ -34,7 +34,7 @@ export class MessageViewController extends ViewController {
         if (!this.currentMessage)
             this.next();
 
-        return new Promise<void>(resolve => MessageViewController.onDone.once(resolve, this));
+        return new Promise<void>(resolve => MessageViewController.onDone.once(resolve, { sender: this }));
     }
 
     public next() {

@@ -158,7 +158,7 @@ export class TableViewController<TCell extends View> extends ViewController {
                 this.deselectRow(row);
             else
                 this.selectRow(row);
-        }, cell);
+        }, { sender: cell });
 
         return cell;
     }

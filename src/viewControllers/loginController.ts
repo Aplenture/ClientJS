@@ -26,9 +26,9 @@ export class LoginController extends ViewController {
         this.view.appendChild(this.keepLoginSwitch);
         this.view.appendChild(this.loginButton);
 
-        TextField.onReturn.on(() => this.login(), this.usernameTextfield);
-        TextField.onReturn.on(() => this.login(), this.passwordTextfield);
-        Button.onClick.on(() => this.login(), this.loginButton);
+        TextField.onReturn.on(() => this.login(), { sender: this.usernameTextfield });
+        TextField.onReturn.on(() => this.login(), { sender: this.passwordTextfield });
+        Button.onClick.on(() => this.login(), { sender: this.loginButton });
 
         super.init();
     }

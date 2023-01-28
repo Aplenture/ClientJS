@@ -43,11 +43,11 @@ export abstract class App<TConfig extends AppConfig> {
 
         const messagePopupViewController = new PopupViewController('message');
 
-        MessageViewController.onMessage.on(() => messagePopupViewController.view.visible = this.messageViewController.parent == messagePopupViewController, this.messageViewController);
-        MessageViewController.onDone.on(() => messagePopupViewController.view.visible = false, this.messageViewController);
+        MessageViewController.onMessage.on(() => messagePopupViewController.view.visible = this.messageViewController.parent == messagePopupViewController, { sender: this.messageViewController });
+        MessageViewController.onDone.on(() => messagePopupViewController.view.visible = false, { sender: this.messageViewController });
 
-        Router.onRouteChanged.on((route, router) => route.isPrivate && !this.session.access && router.changeRoute(config.unauthorizedRoute), this.router);
-        Session.onAccessChanged.on(access => !access && this.router.route.isPrivate && this.router.changeRoute(config.defaultLanguage), this.session);
+        Router.onRouteChanged.on((route, router) => route.isPrivate && !this.session.access && router.changeRoute(config.unauthorizedRoute), { sender: this.router });
+        Session.onAccessChanged.on(access => !access && this.router.route.isPrivate && this.router.changeRoute(config.defaultLanguage), { sender: this.session });
         Request.onSending.on((params, request) => {
             if (!request.isPrivate) return;
             if (!this.session.access) throw new Error('#_error_no_access');
