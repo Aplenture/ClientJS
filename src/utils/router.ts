@@ -8,12 +8,11 @@ export class RouterConfig {
 export class Router {
     public static readonly onRouteChanged = new Foundation.Event<Router, Route>();
 
-    public routes: readonly Route[];
+    private readonly routes: Route[] = [];
 
     private readonly defaultRoute: string;
 
     private _route: Route = null;
-    private _index: number;
 
     constructor(config: RouterConfig) {
         this.defaultRoute = config.defaultRoute;
@@ -22,35 +21,60 @@ export class Router {
     }
 
     public get route(): Route { return this._route; }
-    public get index(): number { return this._index; }
+    public get index(): number { return this._route && this._route.index; }
 
     public init() {
         const parts = window.location.pathname
             .substring(1)
             .split('/');
 
-        const index = parseInt(parts[1]);
-
-        this._route = this.findRoute(parts[0]);
-        this._index = index && !isNaN(index)
-            ? index
-            : null;
+        this._route = this.findRoute(parts[0], parseInt(parts[1]));
 
         Router.onRouteChanged.emit(this, this._route);
     }
 
+    public addRoute(name: string, isPrivate = false, onRouteChanged?: Foundation.EventHandler<Router, Route>) {
+        const route = { name, isPrivate };
+
+        this.routes.push(route);
+
+        if (onRouteChanged)
+            Router.onRouteChanged.on(onRouteChanged, { args: route });
+    }
+
+    public removeRoute(name) {
+        const index = this.routes.findIndex(route => route.name == name);
+
+        if (0 > index)
+            return;
+
+        this.routes.splice(index, 1);
+    }
+
+    public removeAllRoutes() {
+        this.routes.splice(0, this.routes.length);
+    }
+
     public changeRoute(name: string, index: number = null) {
         this._route = this.findRoute(name);
-        this._index = index;
 
         window.history.pushState({}, this._route.name, index ? `/${this._route.name}/${index}` : `/${this._route.name}`);
 
         Router.onRouteChanged.emit(this, this._route);
     }
 
-    private findRoute(name: string) {
-        return this.routes.find(route => route.name == name)
+    private findRoute(name: string, index?: number) {
+        const route = this.routes.find(route => route.name == name)
             || this.routes.find(route => route.name == this.defaultRoute)
             || this.routes[0];
+
+        if (!route)
+            throw new Error('#_no_routes');
+
+        (route as any).index = index && !isNaN(index)
+            ? index
+            : null;
+
+        return route;
     }
 }
