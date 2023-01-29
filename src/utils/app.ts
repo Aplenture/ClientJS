@@ -14,8 +14,8 @@ export abstract class App<TConfig extends AppConfig> {
     public readonly router: Router;
     public readonly session: Session;
 
-    constructor(messageStack: new () => Foundation.Stack<Foundation.Message>, config: TConfig) {
-        this.messageViewController = new MessageViewController(new messageStack());
+    constructor(config: TConfig) {
+        this.messageViewController = new MessageViewController();
         this.router = new Router(config);
         this.session = new Session(this.messageViewController, config);
     }

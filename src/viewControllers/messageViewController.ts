@@ -10,9 +10,11 @@ export class MessageViewController extends ViewController {
     public readonly textLabel = new Label('text');
     public readonly doneButton = new Button('done');
 
+    private readonly stack = new Foundation.Fifo<Foundation.Message>();
+
     private currentMessage: Foundation.Message;
 
-    constructor(private readonly _stack: Foundation.Stack<Foundation.Message>, ...classes: readonly string[]) {
+    constructor(...classes: readonly string[]) {
         super(...classes, 'message');
     }
 
@@ -29,7 +31,7 @@ export class MessageViewController extends ViewController {
     }
 
     public push(message: Foundation.Message): Promise<void> {
-        this._stack.push(message);
+        this.stack.push(message);
 
         if (!this.currentMessage)
             this.next();
@@ -38,7 +40,7 @@ export class MessageViewController extends ViewController {
     }
 
     public next() {
-        this.currentMessage = this._stack.pop();
+        this.currentMessage = this.stack.pop();
 
         this.titleLabel.text = this.currentMessage && this.currentMessage.title || "";
         this.textLabel.text = this.currentMessage && this.currentMessage.text || "";
