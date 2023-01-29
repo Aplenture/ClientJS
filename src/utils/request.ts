@@ -1,16 +1,16 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 
 export interface RequestOptions {
-    readonly type?: Foundation.RequestMethod;
+    readonly type?: Aplenture.RequestMethod;
     readonly useCredentials?: boolean;
     readonly headers?: NodeJS.ReadOnlyDict<string>;
     readonly isPrivate?: boolean;
 }
 
 export abstract class Request<TParams, TResponse> {
-    public static readonly onSending = new Foundation.Event<Request<any, any>, string>();
+    public static readonly onSending = new Aplenture.Event<Request<any, any>, string>();
 
-    public readonly type: Foundation.RequestMethod;
+    public readonly type: Aplenture.RequestMethod;
     public readonly isPrivate: boolean;
 
     private readonly request = new XMLHttpRequest();
@@ -21,7 +21,7 @@ export abstract class Request<TParams, TResponse> {
         public url = '',
         options: RequestOptions = {}
     ) {
-        this.type = options.type || Foundation.RequestMethod.Get;
+        this.type = options.type || Aplenture.RequestMethod.Get;
         this.isPrivate = options.isPrivate || false;
         this.request.withCredentials = options.useCredentials;
 
@@ -45,7 +45,7 @@ export abstract class Request<TParams, TResponse> {
                 this._running = false;
 
                 switch (this.request.status) {
-                    case Foundation.ResponseCode.OK: {
+                    case Aplenture.ResponseCode.OK: {
                         let result: TResponse;
 
                         try {
@@ -57,7 +57,7 @@ export abstract class Request<TParams, TResponse> {
                         return resolve(result);
                     }
 
-                    case Foundation.ResponseCode.NoContent:
+                    case Aplenture.ResponseCode.NoContent:
                         return resolve(null);
 
                     default:
@@ -97,9 +97,9 @@ export abstract class Request<TParams, TResponse> {
             if (typeof params[key] == 'boolean')
                 args.push(`${key}=${params[key] ? 1 : 0}`);
             else if (Array.isArray(params[key]))
-                (params[key] as any).forEach(value => args.push(`${key}=${Foundation.encodeString(value)}`));
+                (params[key] as any).forEach(value => args.push(`${key}=${Aplenture.encodeString(value)}`));
             else
-                args.push(`${key}=${Foundation.encodeString(params[key] as any)}`)
+                args.push(`${key}=${Aplenture.encodeString(params[key] as any)}`)
         }
 
         return args.join('&');
@@ -109,7 +109,7 @@ export abstract class Request<TParams, TResponse> {
         let result = '';
 
         switch (this.type) {
-            case Foundation.RequestMethod.Get:
+            case Aplenture.RequestMethod.Get:
                 result += params
                     ? url + "?" + params
                     : url;
@@ -125,7 +125,7 @@ export abstract class Request<TParams, TResponse> {
 
     protected createBody(params: string): any {
         switch (this.type) {
-            case Foundation.RequestMethod.Post:
+            case Aplenture.RequestMethod.Post:
                 return params;
 
             default:

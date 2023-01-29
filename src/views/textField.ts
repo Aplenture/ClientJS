@@ -1,4 +1,4 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { View } from "../utils";
 
 export enum TextFieldType {
@@ -7,8 +7,8 @@ export enum TextFieldType {
 }
 
 export class TextField extends View {
-    public static readonly onReturn = new Foundation.Event<TextField, void>();
-    public static readonly onChange = new Foundation.Event<TextField, string>();
+    public static readonly onReturn = new Aplenture.Event<TextField, void>();
+    public static readonly onChange = new Aplenture.Event<TextField, string>();
 
     protected readonly label = document.createElement('label');
     protected readonly input = document.createElement('input');
@@ -36,7 +36,7 @@ export class TextField extends View {
     public set type(value: TextFieldType) { this.input.type = value; }
 
     public get title(): string { return this.label.innerText; }
-    public set title(value: string) { this.label.innerText = Foundation.Localization.translate(value); }
+    public set title(value: string) { this.label.innerText = Aplenture.Localization.translate(value); }
 
     public get text(): string { return this.input.value; }
     public set text(value: string) { this.input.value = value; }

@@ -1,4 +1,4 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { View, ViewController } from "../utils";
 
 export enum TableViewControllerSelectionMode {
@@ -18,8 +18,8 @@ export interface TableViewControllerSource<TCell extends View> {
 }
 
 export class TableViewController<TCell extends View> extends ViewController {
-    public static readonly onSelected = new Foundation.Event<TableViewController<any>, number>();
-    public static readonly onDeselected = new Foundation.Event<TableViewController<any>, number>();
+    public static readonly onSelected = new Aplenture.Event<TableViewController<any>, number>();
+    public static readonly onDeselected = new Aplenture.Event<TableViewController<any>, number>();
 
     private _header: View;
 

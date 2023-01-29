@@ -1,7 +1,7 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 
 export class View {
-    public static readonly onClick = new Foundation.Event<View, void>();
+    public static readonly onClick = new Aplenture.Event<View, void>();
 
     public propaginateClickEvents = false;
 

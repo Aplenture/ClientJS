@@ -1,4 +1,4 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { SessionConfig } from "../models";
 import { BoolRequest, JSONRequest } from "../requests";
 import { MessageViewController } from "../viewControllers";
@@ -6,7 +6,7 @@ import { MessageViewController } from "../viewControllers";
 const KEY_ACCESS = 'session.access';
 
 export class Session {
-    public static readonly onAccessChanged = new Foundation.Event<Session, Foundation.Access>();
+    public static readonly onAccessChanged = new Aplenture.Event<Session, Aplenture.Access>();
 
     private readonly logoutRequest: BoolRequest<{ session: string }>;
     private readonly hasAccessRequest: BoolRequest<{
@@ -26,7 +26,7 @@ export class Session {
         readonly secret: string
     }>;
 
-    private _access: Foundation.Access = null;
+    private _access: Aplenture.Access = null;
 
     constructor(public readonly messageViewController: MessageViewController, config: SessionConfig) {
         this.hasAccessRequest = new BoolRequest(config.hasAccessURL);
@@ -34,7 +34,7 @@ export class Session {
         this.logoutRequest = new BoolRequest(config.logoutURL);
     }
 
-    public get access(): Foundation.Access { return this._access; }
+    public get access(): Aplenture.Access { return this._access; }
 
     public async init() {
         const serializedAccess = window.sessionStorage.getItem(KEY_ACCESS)
@@ -43,7 +43,7 @@ export class Session {
         if (!serializedAccess)
             return;
 
-        const access = Foundation.Access.fromHex(serializedAccess);
+        const access = Aplenture.Access.fromHex(serializedAccess);
 
         if (!(await this.hasAccess(access))) {
             window.localStorage.removeItem(KEY_ACCESS);
@@ -56,7 +56,7 @@ export class Session {
         Session.onAccessChanged.emit(this, this._access);
     }
 
-    public updateAccess(access: Foundation.Access, keepLogin = false) {
+    public updateAccess(access: Aplenture.Access, keepLogin = false) {
         const serialization = access.toHex();
 
         this._access = access;
@@ -81,11 +81,11 @@ export class Session {
         Session.onAccessChanged.emit(this, null);
     }
 
-    public async login(username: string, password: string, keepLogin?: boolean, label?: string): Promise<Foundation.Access> {
+    public async login(username: string, password: string, keepLogin?: boolean, label?: string): Promise<Aplenture.Access> {
         const timestamp = Date.now();
-        const hash = Foundation.toHashInt(timestamp.toString());
-        const privateKey = Foundation.EC.createPrivateKey(password);
-        const sign = Foundation.ECDSA.sign(hash, privateKey).toString();
+        const hash = Aplenture.toHashInt(timestamp.toString());
+        const privateKey = Aplenture.EC.createPrivateKey(password);
+        const sign = Aplenture.ECDSA.sign(hash, privateKey).toString();
 
         try {
             const response = await this.loginRequest.send({
@@ -96,7 +96,7 @@ export class Session {
                 label
             });
 
-            const access = new Foundation.Access(response.session, response.secret, label);
+            const access = new Aplenture.Access(response.session, response.secret, label);
 
             this.updateAccess(access, keepLogin);
 

@@ -1,8 +1,8 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { Route, RouterConfig } from "../models";
 
 export class Router {
-    public static readonly onRouteChanged = new Foundation.Event<Router, Route>();
+    public static readonly onRouteChanged = new Aplenture.Event<Router, Route>();
 
     private readonly routes: Route[] = [];
 
@@ -29,7 +29,7 @@ export class Router {
         Router.onRouteChanged.emit(this, this._route);
     }
 
-    public addRoute(name: string, isPrivate = false, onRouteChanged?: Foundation.EventHandler<Router, Route>) {
+    public addRoute(name: string, isPrivate = false, onRouteChanged?: Aplenture.EventHandler<Router, Route>) {
         const route = { name, isPrivate };
 
         this.routes.push(route);

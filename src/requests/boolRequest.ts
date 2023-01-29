@@ -1,8 +1,8 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { Request } from "../utils";
 
 export class BoolRequest<TParams> extends Request<TParams, boolean> {
     protected parse(data: string): boolean {
-        return Foundation.parseToBool(data);
+        return Aplenture.parseToBool(data);
     }
 }

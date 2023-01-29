@@ -1,4 +1,4 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { ViewController } from "./viewController";
 import { MessageViewController, PopupViewController } from "../viewControllers";
 import { Router } from "./router";
@@ -25,7 +25,7 @@ export abstract class App<TConfig extends AppConfig> {
 
     public async init(config: TConfig) {
         if (config.debug) {
-            Foundation.Localization.onMissingTranslation.on(key => console.warn(`missing translation for key '${key}'`));
+            Aplenture.Localization.onMissingTranslation.on(key => console.warn(`missing translation for key '${key}'`));
             (window as any).app = this;
         }
 
@@ -34,7 +34,7 @@ export abstract class App<TConfig extends AppConfig> {
             text: event.reason
         }) : alert(event.reason));
 
-        await App.loadTranslation(config.defaultLanguage || Foundation.Localization.language);
+        await App.loadTranslation(config.defaultLanguage || Aplenture.Localization.language);
 
         const messagePopupViewController = new PopupViewController('message');
 
@@ -47,8 +47,8 @@ export abstract class App<TConfig extends AppConfig> {
             if (!request.isPrivate) return;
             if (!this.session.access) throw new Error('#_error_no_access');
 
-            request.setHeader(Foundation.RequestHeader.APIKey, this.session.access.id);
-            request.setHeader(Foundation.RequestHeader.Signature, this.session.access.sign(params));
+            request.setHeader(Aplenture.RequestHeader.APIKey, this.session.access.id);
+            request.setHeader(Aplenture.RequestHeader.Signature, this.session.access.sign(params));
         });
 
         messagePopupViewController.appendChild(this.messageViewController);
@@ -80,11 +80,11 @@ export abstract class App<TConfig extends AppConfig> {
         const request = new JSONRequest<void, NodeJS.ReadOnlyDict<string>>();
 
         try {
-            Foundation.Localization.dictionary = await request.send(null, `/${window.navigator.language}.json`);
-            Foundation.Localization.language = window.navigator.language;
+            Aplenture.Localization.dictionary = await request.send(null, `/${window.navigator.language}.json`);
+            Aplenture.Localization.language = window.navigator.language;
         } catch (e) {
-            Foundation.Localization.dictionary = await request.send(null, `/${defaultLanguage}.json`);
-            Foundation.Localization.language = defaultLanguage;
+            Aplenture.Localization.dictionary = await request.send(null, `/${defaultLanguage}.json`);
+            Aplenture.Localization.language = defaultLanguage;
         }
     }
 }

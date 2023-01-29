@@ -1,4 +1,4 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { ViewController } from "../utils";
 import { Label } from "../views";
 
@@ -10,7 +10,7 @@ export class StopwatchViewController extends ViewController {
         milliseconds: false
     }
 
-    public readonly stopwatch = new Foundation.Stopwatch();
+    public readonly stopwatch = new Aplenture.Stopwatch();
 
     private interval: NodeJS.Timer;
 
@@ -25,7 +25,7 @@ export class StopwatchViewController extends ViewController {
     }
 
     public updateTime(duration: number) {
-        this.label.text = Foundation.formatDuration(duration, this.options);
+        this.label.text = Aplenture.formatDuration(duration, this.options);
     }
 
     public start(time?: number) {

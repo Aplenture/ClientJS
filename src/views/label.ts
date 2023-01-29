@@ -1,4 +1,4 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { View } from "../utils";
 
 export class Label extends View {
@@ -11,5 +11,5 @@ export class Label extends View {
     }
 
     public get text(): string { return this.label.innerText; }
-    public set text(value: string) { this.label.innerText = Foundation.Localization.translate(value); }
+    public set text(value: string) { this.label.innerText = Aplenture.Localization.translate(value); }
 }

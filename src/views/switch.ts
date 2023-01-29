@@ -1,8 +1,8 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { View } from "../utils";
 
 export class Switch extends View {
-    public static readonly onChange = new Foundation.Event<Switch, boolean>();
+    public static readonly onChange = new Aplenture.Event<Switch, boolean>();
 
     protected readonly label = document.createElement('label');
     protected readonly input = document.createElement('input');
@@ -27,7 +27,7 @@ export class Switch extends View {
     }
 
     public get title(): string { return this.label.innerText; }
-    public set title(value: string) { this.label.innerText = Foundation.Localization.translate(value); }
+    public set title(value: string) { this.label.innerText = Aplenture.Localization.translate(value); }
 
     public get enabled(): boolean { return this.input.checked; }
     public set enabled(value: boolean) { this.input.checked = value; }

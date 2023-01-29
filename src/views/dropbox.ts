@@ -1,8 +1,8 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { View } from "../utils";
 
 export class Dropbox extends View {
-    public static readonly onSelected = new Foundation.Event<Dropbox, number>();
+    public static readonly onSelected = new Aplenture.Event<Dropbox, number>();
 
     protected readonly label = document.createElement('label');
     protected readonly select = document.createElement('select');
@@ -19,7 +19,7 @@ export class Dropbox extends View {
     }
 
     public get title(): string { return this.label.innerText; }
-    public set title(value: string) { this.label.innerText = Foundation.Localization.translate(value); }
+    public set title(value: string) { this.label.innerText = Aplenture.Localization.translate(value); }
 
     public get options(): readonly string[] {
         return this._options.map(option => option.text);

@@ -18,7 +18,7 @@
     },
     "homepage": "https://github.com/Aplenture/ClientJS#readme",
     "dependencies": {
-        "foundationjs": "github:Aplenture/FoundationJS"
+        "aplenturejs": "github:Aplenture/AplentureJS"
     },
     "devDependencies": {
         "@types/chai": "^4.3.4",

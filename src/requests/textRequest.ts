@@ -1,8 +1,8 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { Request } from "../utils";
 
 export class TextRequest<TParams> extends Request<TParams, string> {
     protected parse(data: string): string {
-        return Foundation.parseToString(data);
+        return Aplenture.parseToString(data);
     }
 }

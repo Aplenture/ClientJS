@@ -1,18 +1,18 @@
-import * as Foundation from "foundationjs";
+import * as Aplenture from "aplenturejs";
 import { ViewController } from "../utils";
 import { Button, Label } from "../views";
 
 export class MessageViewController extends ViewController {
-    public static readonly onMessage = new Foundation.Event<MessageViewController, Foundation.Message>();
-    public static readonly onDone = new Foundation.Event<MessageViewController, void>();
+    public static readonly onMessage = new Aplenture.Event<MessageViewController, Aplenture.Message>();
+    public static readonly onDone = new Aplenture.Event<MessageViewController, void>();
 
     public readonly titleLabel = new Label('title');
     public readonly textLabel = new Label('text');
     public readonly doneButton = new Button('done');
 
-    private readonly stack = new Foundation.Fifo<Foundation.Message>();
+    private readonly stack = new Aplenture.Fifo<Aplenture.Message>();
 
-    private currentMessage: Foundation.Message;
+    private currentMessage: Aplenture.Message;
 
     constructor(...classes: readonly string[]) {
         super(...classes, 'message');
@@ -30,7 +30,7 @@ export class MessageViewController extends ViewController {
         super.init();
     }
 
-    public push(message: Foundation.Message): Promise<void> {
+    public push(message: Aplenture.Message): Promise<void> {
         this.stack.push(message);
 
         if (!this.currentMessage)
