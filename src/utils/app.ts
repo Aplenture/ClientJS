@@ -1,16 +1,11 @@
 import * as Foundation from "foundationjs";
 import { ViewController } from "./viewController";
 import { MessageViewController, PopupViewController } from "../viewControllers";
-import { Router, RouterConfig } from "./router";
-import { Session, SessionConfig } from "./session";
+import { Router } from "./router";
+import { Session } from "./session";
 import { JSONRequest } from "../requests";
 import { Request } from "./request";
-
-interface AppConfig extends RouterConfig, SessionConfig {
-    readonly debug?: boolean;
-    readonly defaultLanguage?: string;
-    readonly unauthorizedRoute: string;
-}
+import { AppConfig } from "../models";
 
 export abstract class App<TConfig extends AppConfig> {
     public readonly rootViewController = new ViewController('root');

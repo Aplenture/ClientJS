@@ -1,14 +1,9 @@
 import * as Foundation from "foundationjs";
+import { SessionConfig } from "../models";
 import { BoolRequest, JSONRequest } from "../requests";
 import { MessageViewController } from "../viewControllers";
 
 const KEY_ACCESS = 'session.access';
-
-export interface SessionConfig {
-    readonly hasAccessURL: string;
-    readonly loginURL: string;
-    readonly logoutURL: string;
-}
 
 export class Session {
     public static readonly onAccessChanged = new Foundation.Event<Session, Foundation.Access>();

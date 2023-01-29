@@ -1,9 +1,5 @@
 import * as Foundation from "foundationjs";
-import { Route } from "../models";
-
-export class RouterConfig {
-    readonly defaultRoute?: string;
-}
+import { Route, RouterConfig } from "../models";
 
 export class Router {
     public static readonly onRouteChanged = new Foundation.Event<Router, Route>();
